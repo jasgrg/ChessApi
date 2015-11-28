@@ -1,0 +1,7 @@
+*.psess
+*.vsp
+ChessApi/obj/
+ChessApi/bin/
+ChessApi.Tests/obj/
+.vs/
+ChessApi.Tests/bin/
