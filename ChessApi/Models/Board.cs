@@ -134,7 +134,7 @@ namespace ChessApi.Models
             return Squares[y, x];
         }
 
-        private void MakeMove(Move mv)
+        public void MakeMove(Move mv)
         {
             MovePiece(mv);
             
