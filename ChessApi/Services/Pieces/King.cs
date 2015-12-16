@@ -74,7 +74,7 @@ namespace ChessApi.Services.Pieces
                     var oneRight = new Coordinate(Location.X + 1, Location.Y);
                     var twoRight = new Coordinate(Location.X + 2, Location.Y);
                     var rook = board.GetPiece((short)(Location.X + 3), Location.Y);
-                    if(twoRight.X > 7) { var stop = 1; }
+
                     if(board.GetPiece(oneRight.X, oneRight.Y) == null && board.GetPiece(twoRight.X, twoRight.Y) == null &&
                         rook != null && rook.PieceType == PieceType.Rook && rook.HasMoved == false)
                     {
