@@ -14,6 +14,8 @@ namespace ChessApi.Models
     {
         private King _lightKing;
         private King _darkKing;
+        private List<IPiece> _lightPieces = new List<IPiece>();
+        private List<IPiece> _darkPieces = new List<IPiece>();
 
         [DataMember]
         public Square[,] Squares { get; set; }
@@ -42,23 +44,23 @@ namespace ChessApi.Models
 
         public void Initialize()
         {
-            SetPiece(0, 0, Piece.GetPiece(PieceType.Rook, Player.Dark, null));
-            SetPiece(1, 0, Piece.GetPiece(PieceType.Knight, Player.Dark, null));
-            SetPiece(2, 0, Piece.GetPiece(PieceType.Bishop, Player.Dark, null));
-            SetPiece(3, 0, Piece.GetPiece(PieceType.Queen, Player.Dark, null));
-            SetPiece(4, 0, Piece.GetPiece(PieceType.King, Player.Dark, null));
-            SetPiece(5, 0, Piece.GetPiece(PieceType.Bishop, Player.Dark, null));
-            SetPiece(6, 0, Piece.GetPiece(PieceType.Knight, Player.Dark, null));
-            SetPiece(7, 0, Piece.GetPiece(PieceType.Rook, Player.Dark, null));
+            AddPieceToBoard(0, 0, Piece.GetPiece(PieceType.Rook, Player.Dark, null));
+            AddPieceToBoard(1, 0, Piece.GetPiece(PieceType.Knight, Player.Dark, null));
+            AddPieceToBoard(2, 0, Piece.GetPiece(PieceType.Bishop, Player.Dark, null));
+            AddPieceToBoard(3, 0, Piece.GetPiece(PieceType.Queen, Player.Dark, null));
+            AddPieceToBoard(4, 0, Piece.GetPiece(PieceType.King, Player.Dark, null));
+            AddPieceToBoard(5, 0, Piece.GetPiece(PieceType.Bishop, Player.Dark, null));
+            AddPieceToBoard(6, 0, Piece.GetPiece(PieceType.Knight, Player.Dark, null));
+            AddPieceToBoard(7, 0, Piece.GetPiece(PieceType.Rook, Player.Dark, null));
 
-            SetPiece(0, 7, Piece.GetPiece(PieceType.Rook, Player.Light, null));
-            SetPiece(1, 7, Piece.GetPiece(PieceType.Knight, Player.Light, null));
-            SetPiece(2, 7, Piece.GetPiece(PieceType.Bishop, Player.Light, null));
-            SetPiece(3, 7, Piece.GetPiece(PieceType.Queen, Player.Light, null));
-            SetPiece(4, 7, Piece.GetPiece(PieceType.King, Player.Light, null));
-            SetPiece(5, 7, Piece.GetPiece(PieceType.Bishop, Player.Light, null));
-            SetPiece(6, 7, Piece.GetPiece(PieceType.Knight, Player.Light, null));
-            SetPiece(7, 7, Piece.GetPiece(PieceType.Rook, Player.Light, null));
+            AddPieceToBoard(0, 7, Piece.GetPiece(PieceType.Rook, Player.Light, null));
+            AddPieceToBoard(1, 7, Piece.GetPiece(PieceType.Knight, Player.Light, null));
+            AddPieceToBoard(2, 7, Piece.GetPiece(PieceType.Bishop, Player.Light, null));
+            AddPieceToBoard(3, 7, Piece.GetPiece(PieceType.Queen, Player.Light, null));
+            AddPieceToBoard(4, 7, Piece.GetPiece(PieceType.King, Player.Light, null));
+            AddPieceToBoard(5, 7, Piece.GetPiece(PieceType.Bishop, Player.Light, null));
+            AddPieceToBoard(6, 7, Piece.GetPiece(PieceType.Knight, Player.Light, null));
+            AddPieceToBoard(7, 7, Piece.GetPiece(PieceType.Rook, Player.Light, null));
 
             for (short y = 2; y < 6; y++)
             {
@@ -70,8 +72,8 @@ namespace ChessApi.Models
 
             for (short i = 0; i < 8; i++)
             {
-                SetPiece(i, 1, Piece.GetPiece(PieceType.Pawn, Player.Dark, null));
-                SetPiece(i, 6, Piece.GetPiece(PieceType.Pawn, Player.Light, null));
+                AddPieceToBoard(i, 1, Piece.GetPiece(PieceType.Pawn, Player.Dark, null));
+                AddPieceToBoard(i, 6, Piece.GetPiece(PieceType.Pawn, Player.Light, null));
             }
 
 
@@ -88,7 +90,7 @@ namespace ChessApi.Models
                     pc = Piece.GetPiece(sq.Piece.PieceType, sq.Piece.Player, sq.Piece.Location);
                     pc.HasMoved = sq.Piece.HasMoved;
                 }
-                dest.SetPiece(sq.Location.X, sq.Location.Y, pc);
+                dest.AddPieceToBoard(sq.Location.X, sq.Location.Y, pc);
             }
             dest.PlayerTurn = PlayerTurn;
             return dest;
@@ -102,6 +104,23 @@ namespace ChessApi.Models
         public IPiece GetPiece(short x, short y)
         {
             return Squares[y, x].Piece;
+        }
+
+        public void AddPieceToBoard(short x, short y, IPiece piece)
+        {
+            if(piece != null)
+            {
+                if (piece.Player == Player.Dark)
+                {
+                    _darkPieces.Add(piece);
+                }
+                else
+                {
+                    _lightPieces.Add(piece);
+                }
+            }
+
+            SetPiece(x, y, piece);
         }
 
         public void SetPiece(short x, short y, IPiece piece)
@@ -163,11 +182,15 @@ namespace ChessApi.Models
             
             if(capturedPiece != null)
             {
-                switch (capturedPiece.PieceType)
+                if(capturedPiece.PieceType == PieceType.King)
                 {
-                    case PieceType.King:
-                        throw new System.Exception("Cannot capture the king.");
+                    throw new System.Exception("Cannot capture the king.");
                 }
+
+                if(capturedPiece.Player == Player.Dark)
+                    _darkPieces.Remove(capturedPiece);
+                else
+                    _lightPieces.Remove(capturedPiece);
             }
 
             if(movedpiece != null)
@@ -198,15 +221,9 @@ namespace ChessApi.Models
 
         public List<IPiece> GetPiecesForPlayer(Player player)
         {
-            var result = new List<IPiece>();
-            foreach (var sq in Squares)
-            {
-                if (sq.Piece != null && sq.Piece.Player == player)
-                {
-                    result.Add(sq.Piece);
-                }
-            }
-            return result;
+            if (player == Player.Dark)
+                return _darkPieces;
+            return _lightPieces;
         }
 
         public bool PlayerHasCheck(Player player)
@@ -269,7 +286,22 @@ namespace ChessApi.Models
             return result;
         }
 
-        public void FindKings()
+        public void Init()
+        {
+            foreach (var sq in Squares)
+            {
+                if (sq.Piece != null)
+                {
+                    if (sq.Piece.Player == Player.Dark)
+                        _darkPieces.Add(sq.Piece);
+                    else
+                        _lightPieces.Add(sq.Piece);
+                }
+            }
+            FindKings();
+        }
+
+        private void FindKings()
         {
             if(_darkKing == null)
             {

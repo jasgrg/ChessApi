@@ -11,7 +11,7 @@ namespace ChessApi.Controllers
     {
         public IEnumerable<Coordinate> Post([FromUri] short x, [FromUri] short y, [FromBody] Board board)
         {
-            board.FindKings();
+            board.Init();
             Debug.WriteLine("** Input **");
             Debug.WriteLine(board.ToString());
 
