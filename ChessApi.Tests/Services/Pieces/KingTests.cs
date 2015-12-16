@@ -34,7 +34,7 @@ namespace ChessApi.Tests.Services.Pieces
         [TestMethod]
         public void PossibleMovesDoesNotReturnMovesResultingInCheckByKnight()
         {
-            var king = new King(null, Player.Light);
+            var king = new King(null, Player.Light) { HasMoved = true };
             _board.SetPiece(1, 1, king);
             _board.SetPiece(0, 4, new Knight(null, Player.Dark));
             var moves = king.GetPossibleMoves(_board);
@@ -45,7 +45,7 @@ namespace ChessApi.Tests.Services.Pieces
         [TestMethod]
         public void PossibleMovesDoesNotReturnMovesResultingInCheckByPawn()
         {
-            var king = new King(null, Player.Light);
+            var king = new King(null, Player.Light) { HasMoved = true };
             _board.SetPiece(6, 6, king);
             _board.SetPiece(5, 4, new Pawn(null, Player.Dark));
             var moves = king.GetPossibleMoves(_board);

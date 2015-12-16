@@ -32,5 +32,17 @@ namespace ChessApi.Tests.Models
             var result = _board.GetPiece(1, 2);
             Assert.AreEqual(PieceType.Pawn, result.PieceType);
         }
+
+        [TestMethod]
+        public void CheckMoveForCheckMustNotAlterBoard()
+        {
+            _board.Initialize();
+
+
+            var origBoard = _board.Copy();
+            var mv = _board.CheckMoveForCheck(new Move(new Coordinate(0, 1), new Coordinate(0, 3)));
+
+            Assert.IsTrue(_board.Equals(origBoard));
+        }
     }
 }

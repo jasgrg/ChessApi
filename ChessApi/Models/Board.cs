@@ -207,10 +207,50 @@ namespace ChessApi.Models
         
         public bool CheckMoveForCheck(Move move)
         {
-            var newBoard = Copy();
-            var currentPlayer = newBoard.PlayerTurn;
-            newBoard.MovePiece(move);
-            return newBoard.PlayerHasCheck(currentPlayer);
+            //var newBoard = Copy();
+            var from = GetPiece(move.From.X, move.From.Y);
+            var fromMoved = from != null ? from.HasMoved : false;
+
+            var from2 = default(IPiece);
+            var from2Moved = default(bool);
+
+            if (move.From2 != null)
+            {
+                from2 = GetPiece(move.From2.X, move.From2.Y);
+                from2Moved = from2 != null ? from2.HasMoved : false;
+            }
+
+            var to = GetPiece(move.To.X, move.To.Y);
+            var toMoved = to != null ? to.HasMoved : false;
+
+            var to2 = default(IPiece);
+            var to2Moved = default(bool);
+            if(move.To2 != null)
+            {
+                to2 = GetPiece(move.To2.X, move.To2.Y);
+                to2Moved = to2 != null ? to2.HasMoved : false;
+            }
+            
+
+            var currentPlayer = PlayerTurn;
+            MovePiece(move);
+            var result = PlayerHasCheck(currentPlayer);
+
+            PlayerTurn = currentPlayer;
+
+            if(from != null) from.HasMoved = fromMoved;
+            if(from2 != null)from2.HasMoved = from2Moved;
+            if(to != null)to.HasMoved = toMoved;
+            if(to2 !=  null)to2.HasMoved = to2Moved;
+
+            SetPiece(move.From.X, move.From.Y, from);
+            if(move.From2 != null)
+                SetPiece(move.From2.X, move.From2.Y, from2);
+            SetPiece(move.To.X, move.To.Y, to);
+            if(move.To2 != null)
+                SetPiece(move.To2.X, move.To2.Y, to2);
+
+            return result;
         }
 
         public void FindKings()
@@ -260,6 +300,37 @@ namespace ChessApi.Models
                     return "?";
 
             }
+        }
+
+        public bool Equals(Board brd)
+        {
+            if (PlayerTurn != brd.PlayerTurn) { return false; }
+
+            for (short y = 0; y < 8; y++)
+            {
+                for (short x = 0; x < 8; x++)
+                {
+                    var o = GetSquare(x, y);
+                    var n = brd.GetSquare(x, y);
+
+                    if (o.Piece == null && n.Piece == null)
+                    {
+                        continue;
+                    }
+
+                    if (o.Piece == null || n.Piece == null)
+                    {
+                        return false;
+                    }
+                    if ((o.Piece.PieceType != n.Piece.PieceType) || (o.Piece.HasMoved != n.Piece.HasMoved) ||
+                        (o.Piece.Location.X != n.Piece.Location.X) || (o.Piece.Location.Y != n.Piece.Location.Y) ||
+                        (o.Piece.Player != n.Piece.Player))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
     }

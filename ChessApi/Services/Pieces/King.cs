@@ -73,28 +73,30 @@ namespace ChessApi.Services.Pieces
                 {
                     var oneRight = new Coordinate(Location.X + 1, Location.Y);
                     var twoRight = new Coordinate(Location.X + 2, Location.Y);
+                    var rook = board.GetPiece((short)(Location.X + 3), Location.Y);
                     if(twoRight.X > 7) { var stop = 1; }
-                    if(board.GetPiece(oneRight.X, oneRight.Y) == null && board.GetPiece(twoRight.X, twoRight.Y) == null)
+                    if(board.GetPiece(oneRight.X, oneRight.Y) == null && board.GetPiece(twoRight.X, twoRight.Y) == null &&
+                        rook != null && rook.PieceType == PieceType.Rook && rook.HasMoved == false)
                     {
                         if(!board.CheckMoveForCheck(new Move(Location, oneRight)) && 
                             !board.CheckMoveForCheck(new Move(Location, twoRight)))
                         {
-                            var rookLoc = new Coordinate(Location.X + 3, Location.Y);
-                            result.Add(new Move(Location, twoRight, rookLoc, oneRight));
+                            result.Add(new Move(Location, twoRight, rook.Location, oneRight));
                         }
                     }
 
                     var oneLeft = new Coordinate(Location.X - 1, Location.Y);
                     var twoLeft = new Coordinate(Location.X - 2, Location.Y);
                     var threeLeft = new Coordinate(Location.X - 3, Location.Y);
-                    if (board.GetPiece(oneLeft.X, oneLeft.Y) == null && board.GetPiece(twoLeft.X, twoLeft.Y) == null && board.GetPiece(threeLeft.X, threeLeft.Y) == null)
+                    rook = board.GetPiece((short)(Location.X - 4), Location.X);
+                    if (board.GetPiece(oneLeft.X, oneLeft.Y) == null && board.GetPiece(twoLeft.X, twoLeft.Y) == null && board.GetPiece(threeLeft.X, threeLeft.Y) == null
+                        && rook != null && rook.PieceType == PieceType.Rook && rook.HasMoved == false)
                     {
                         if (!board.CheckMoveForCheck(new Move(Location, oneLeft)) &&
                             !board.CheckMoveForCheck(new Move(Location, twoLeft)) &&
                             !board.CheckMoveForCheck(new Move(Location, threeLeft)))
                         {
-                            var rookLoc = new Coordinate(Location.X - 4, Location.Y);
-                            result.Add(new Move(Location, threeLeft, rookLoc, twoLeft));
+                            result.Add(new Move(Location, twoLeft, rook.Location, oneLeft));
                         }
                     }
                 }
