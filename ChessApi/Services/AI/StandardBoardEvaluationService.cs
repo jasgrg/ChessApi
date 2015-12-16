@@ -34,8 +34,6 @@ namespace ChessApi.Services.AI
 
             Double score = 0;
 
-
-
             var playerPieces = board.GetPiecesForPlayer(board.PlayerTurn);
             var opposingPieces = board.GetPiecesForPlayer(board.OpposingPlayer());
 
