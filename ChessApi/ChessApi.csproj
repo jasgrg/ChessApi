@@ -111,6 +111,7 @@
     <Compile Include="Controllers\BoardController.cs" />
     <Compile Include="Controllers\PossibleMoveController.cs" />
     <Compile Include="Controllers\MoveController.cs" />
+    <Compile Include="Enums\BoardStatus.cs" />
     <Compile Include="Enums\Color.cs" />
     <Compile Include="Enums\MoveResultType.cs" />
     <Compile Include="Enums\MoveType.cs" />

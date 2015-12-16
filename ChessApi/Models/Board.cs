@@ -1,4 +1,5 @@
-﻿using ChessApi.Enums;
+﻿using System;
+using ChessApi.Enums;
 using ChessApi.Interfaces;
 using ChessApi.Services.Pieces;
 using System.Collections.Generic;
@@ -126,6 +127,21 @@ namespace ChessApi.Models
                     else
                         _darkKing = (King)piece;
                 }
+            }
+        }
+
+        public BoardStatus GetBoardStatus()
+        {
+            var hasCheck = PlayerHasCheck(PlayerTurn);
+            var hasMoves = GetPiecesForPlayer(PlayerTurn).SelectMany(x => x.GetPossibleMoves(this)).Any();
+
+            if (hasCheck)
+            {
+                return hasMoves ? BoardStatus.Check : BoardStatus.Checkmate;
+            }
+            else
+            {
+                return hasMoves ? BoardStatus.Normal : BoardStatus.Stalemate;
             }
         }
 

@@ -2,6 +2,7 @@
 using System;
 using ChessApi.Models;
 using ChessApi.Services.AI;
+using System.Linq;
 
 namespace ChessApi.Services
 {
@@ -23,50 +24,74 @@ namespace ChessApi.Services
         {
             if(depth == 0)
             {
-                return new TreeNode(null, _evalService.Evaluate(board));
+                return GetLeafNode(board, maximizer);
             }
-
             var pieces = board.GetPiecesForPlayer(board.PlayerTurn);
             var bestScore = maximizer ? _minScore : _maxScore;
             var bestMove = default(Move);
-            foreach(var pc in pieces)
+
+            var moves = pieces.SelectMany(x => x.GetPossibleMoves(board));
+            if (!moves.Any())
             {
-                var moves = pc.GetPossibleMoves(board);
-                foreach(var mv in moves)
+                if (board.PlayerHasCheck(board.PlayerTurn))
                 {
-                    var newBoard = board.Copy();
-                    newBoard.MakeMove(mv);
-                    var newNode = MiniMax(newBoard, depth - 1, alpha, beta, !maximizer);
-                    if (maximizer)
+                    return new TreeNode(null, maximizer ? _maxScore : _minScore);
+                }
+            }
+
+            foreach (var mv in moves)
+            {
+                var newBoard = board.Copy();
+                newBoard.MakeMove(mv);
+                var newNode = MiniMax(newBoard, depth - 1, alpha, beta, !maximizer);
+                if (maximizer)
+                {
+                    if(newNode.Score > bestScore)
                     {
-                        if(newNode.Score > bestScore)
-                        {
-                            bestScore = newNode.Score;
-                            bestMove = mv;
-                        }
-                        alpha = Math.Max(alpha, bestScore);
-                        if(beta <= alpha)
-                        {
-                            return new TreeNode(bestMove, bestScore);
-                        }
+                        bestScore = newNode.Score;
+                        bestMove = mv;
                     }
-                    else
+                    alpha = Math.Max(alpha, bestScore);
+                    if(beta <= alpha)
                     {
-                        if(newNode.Score < bestScore)
-                        {
-                            bestScore = newNode.Score;
-                            bestMove = mv;
-                        }
-                        beta = Math.Min(beta, bestScore);
-                        if(beta <= alpha) 
-                        {
-                            return new TreeNode(bestMove, bestScore);
-                        }
+                        return new TreeNode(bestMove, bestScore);
+                    }
+                }
+                else
+                {
+                    if(newNode.Score < bestScore)
+                    {
+                        bestScore = newNode.Score;
+                        bestMove = mv;
+                    }
+                    beta = Math.Min(beta, bestScore);
+                    if(beta <= alpha) 
+                    {
+                        return new TreeNode(bestMove, bestScore);
                     }
                 }
             }
             return new TreeNode(bestMove, bestScore); 
+        }
 
+        private TreeNode GetLeafNode(Board board, Boolean maximizer)
+        {
+            var status = board.GetBoardStatus();
+            var score = 0d;
+
+            if (status == Enums.BoardStatus.Checkmate)
+            {
+                score = maximizer ? _maxScore : _minScore;
+            }
+            else if (status == Enums.BoardStatus.Stalemate)
+            {
+                score = 0;
+            }
+            else
+            {
+                score = _evalService.Evaluate(board);
+            }
+            return new TreeNode(null, score);
 
         }
     }
