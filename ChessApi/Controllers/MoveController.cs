@@ -10,7 +10,7 @@ namespace ChessApi.Controllers
     {
         public MoveResponse PostNextMove([FromBody] Board board)
         {
-            board.FindKings();
+            board.Init();
             Debug.WriteLine("** Input **");
             Debug.WriteLine(board.ToString());
             var aiService = new MiniMaxService();
